@@ -42,17 +42,20 @@ class Player:
 
 @router.callback_query(F.data == 'check_role')
 async def check_mafia_role(call: CallbackQuery):
-    if call.from_user.id in list(sessions[call.message.chat.id]['Живые игроки'].keys()):
-        if mafia_func.count_mafia(sessions[call.message.chat.id]['Живые игроки']) != 1 and sessions[call.message.chat.id]['Живые игроки'][call.from_user.id].role == 'Мафия':
-            string = 'Мафии в игре:\n'
-            for i in sessions[call.message.chat.id]['Живые игроки'].keys():
-                if sessions[call.message.chat.id]['Живые игроки'][i].role == 'Мафия':
-                    string += sessions[call.message.chat.id]['Живые игроки'][i].full_name + "\n"
-            await call.answer(f"Ваша роль {sessions[call.message.chat.id]['Живые игроки'][call.from_user.id].role}\n{string}", show_alert=True)
+    if call.message.chat.id in sessions.keys():
+        if call.from_user.id not in sessions[call.message.chat.id]["Живые игроки"]:
+            if mafia_func.count_mafia(sessions[call.message.chat.id]['Живые игроки']) != 1 and sessions[call.message.chat.id]['Живые игроки'][call.from_user.id].role == 'Мафия':
+                string = 'Мафии в игре:\n'
+                for i in sessions[call.message.chat.id]['Живые игроки'].keys():
+                    if sessions[call.message.chat.id]['Живые игроки'][i].role == 'Мафия':
+                        string += sessions[call.message.chat.id]['Живые игроки'][i].full_name + "\n"
+                await call.answer(f"Ваша роль {sessions[call.message.chat.id]['Живые игроки'][call.from_user.id].role}\n{string}", show_alert=True)
+            else:
+                await call.answer(f"Ваша роль {sessions[call.message.chat.id]['Живые игроки'][call.from_user.id].role}", show_alert=True)
         else:
-            await call.answer(f"Ваша роль {sessions[call.message.chat.id]['Живые игроки'][call.from_user.id].role}", show_alert=True)
+            await call.answer("Вы не зарегистрировались на игру!", show_alert=True)
     else:
-        await call.answer("Вы не зарегистрировались на игру!", show_alert=True)
+        await call.answer("Эта кнопка больше не действительна!", show_alert=True)
 
 
 @router.callback_query(F.data == 'register')
