@@ -145,9 +145,13 @@ async def mafia_vote(call: types.CallbackQuery):
 async def mafia_vote(call: types.CallbackQuery):
     if call.from_user.id in mafia_members:
         if mafia_members[call.from_user.id].role == "Мафия":
-            mafia_members[call.from_user.id].vote_on_role_voting = int(call.data.split('|')[1])
-            await call.answer(f'Вы решили убить {mafia_members[int(call.data.split("|")[1])].full_name}',
-                              show_alert=True)
+            if mafia_members[call.from_user.id].vote_on_role_voting is None:
+                mafia_members[call.from_user.id].vote_on_role_voting = int(call.data.split('|')[1])
+                await call.answer(f'Вы решили убить {mafia_members[int(call.data.split("|")[1])].full_name}',
+                                  show_alert=True)
+            else:
+                await call.answer(f'Вы уже предложили убить {mafia_members[mafia_members[call.from_user.id]].full_name}!',
+                                  show_alert=True)
         else:
             await call.answer(f'Вы не мафия!(и не клоун)\nP.S Наверное...', show_alert=True)
     else:
