@@ -4,8 +4,6 @@ import mafia_func
 from aiogram.types import FSInputFile
 import sys
 import os
-user_active_repeat = False
-router = Router()
 from aiogram.filters import Command
 from aiogram.types import Message, CallbackQuery
 from aiogram.enums import ParseMode
@@ -13,21 +11,28 @@ from aiogram.utils.keyboard import InlineKeyboardBuilder
 import asyncio
 from bot import python
 
-sessies = {}
+# Главные переменные, я буду над ними еще работать (надо уменьшить их количество)
+# Роутер - ответвление бота чисто под мафию
+# sessions - пока не используется, но я хочу вести несколько мафий на одном боте одновременно
+# mafia_active и night_active, благодаря sessions должны уйти, но пока это просто тумблеры ночи и включения катки
+# 3 следующие понятны по названию
+# mercy рандомная переменная запрещающая доку лечить себя
+router = Router()
+sessions = {}
 mafia_active = False
 night_active = False
 mafia_members = {}
 mafia_dead_members = {}
 days = 0
-merce = 0
+mercy = 0
 
 night_art = FSInputFile("images/night_art.jpg")
 day_art = FSInputFile("images/day_art.jpg")
 
 
-async def restart_script():
-    global sessies
-    if not sessies:
+def restart_script():
+    global sessions
+    if not sessions:
         os.execl(python, python, *sys.argv)
 
 
@@ -39,7 +44,6 @@ class Player:
         self.vote_on_voting = None
         self.vote_on_role_voting = None
         self.doctor_himself = True
-        self.check = True
 
 
 @router.callback_query(F.data == 'check_role')
@@ -77,69 +81,64 @@ async def registration_to_game(call: CallbackQuery):
 
 @router.callback_query(lambda message: '%doctor%' in message.data)
 async def mafia_vote(call: types.CallbackQuery):
-    global merce
+    global mercy
     if call.from_user.id in mafia_members.keys():
         print(mafia_members[call.from_user.id].doctor_himself)
         if mafia_members[call.from_user.id].role == "Доктор":
             if int(call.data.split('|')[1]) == call.from_user.id:
                 if mafia_members[call.from_user.id].doctor_himself:
-                    merce = 1
                     mafia_members[call.from_user.id].doctor_himself = False
                     mafia_members[call.from_user.id].vote_on_role_voting = call.from_user.id
-                    await call.answer(f'Вы решили эгоистично помочь себе!', show_alert=True)
-                elif merce == 1:
                     await call.answer(f'Вы решили эгоистично помочь себе!', show_alert=True)
                 else:
                     await call.answer(f'Вы уже помогали себе в этой игре!', show_alert=True)
             else:
-                if merce == 1:
-                    mafia_members[call.from_user.id].doctor_himself = True
-                    merce = 0
-                    mafia_members[call.from_user.id].vote_on_role_voting = int(call.data.split('|')[1])
-                    await call.answer(f'Вы решили помочь {mafia_members[int(call.data.split("|")[1])].full_name}!',
-                                      show_alert=True)
-                else:
-                    mafia_members[call.from_user.id].vote_on_role_voting = int(call.data.split('|')[1])
-                    await call.answer(f'Вы решили помочь {mafia_members[int(call.data.split("|")[1])].full_name}!',
-                                      show_alert=True)
+                mafia_members[call.from_user.id].vote_on_role_voting = int(call.data.split('|')[1])
+                await call.answer(f'Вы решили помочь {mafia_members[int(call.data.split("|")[1])].full_name}!',
+                                  show_alert=True)
         else:
             await call.answer(f'Вы не доктор!', show_alert=True)
     else:
-        await call.answer("Вы не учавствуете в игре!", show_alert=True)
+        await call.answer("Вы не участвуете в игре!", show_alert=True)
 
 
 @router.callback_query(lambda message: '%lover%' in message.data)
 async def mafia_vote(call: types.CallbackQuery):
     if call.from_user.id in mafia_members.keys():
         if mafia_members[call.from_user.id].role == "Любовница":
-            if int(call.data.split('|')[1]) == call.from_user.id:
-                await call.answer(f'Вы не можете ублажить себя!\nЧто за извращение?!', show_alert=True)
+            if mafia_members[call.from_user.id].vote_on_role_voting is None:
+                if int(call.data.split('|')[1]) == call.from_user.id:
+                    await call.answer(f'Вы не можете ублажить себя!\nЧто за извращение?!', show_alert=True)
+                else:
+                    mafia_members[call.from_user.id].vote_on_role_voting = int(call.data.split('|')[1])
+                    await call.answer(f'Вы решили ублажить {mafia_members[int(call.data.split("|")[1])].full_name}!',
+                                      show_alert=True)
             else:
-                mafia_members[call.from_user.id].vote_on_role_voting = int(call.data.split('|')[1])
-                await call.answer(f'Вы решили ублажить {mafia_members[int(call.data.split("|")[1])].full_name}!',
+                await call.answer(f'Вы уже навестили {mafia_members[mafia_members[call.from_user.id]].full_name}!',
                                   show_alert=True)
         else:
             await call.answer(f'Вы не любовница!', show_alert=True)
     else:
-        await call.answer("Вы не учавствуете в игре!", show_alert=True)
+        await call.answer("Вы не участвуете в игре!", show_alert=True)
 
 
 @router.callback_query(lambda message: '%sheriff%' in message.data)
 async def mafia_vote(call: types.CallbackQuery):
     if call.from_user.id in mafia_members.keys():
         if mafia_members[call.from_user.id].role == "Шериф":
-            if mafia_members[call.from_user.id].check and mafia_members[int(call.data.split('|')[1])].role == "Мафия":
-                mafia_members[call.from_user.id].check = False
-                await call.answer("Это определенно плохой чувак!", show_alert=True)
-            elif mafia_members[call.from_user.id].check and mafia_members[int(call.data.split('|')[1])].role != "Мафия":
-                mafia_members[call.from_user.id].check = False
-                await call.answer("Это определенно ровный типок!", show_alert=True)
+            if mafia_members[call.from_user.id].vote_on_role_voting is None:
+                if mafia_members[int(call.data.split('|')[1])].role == "Мафия":
+                    mafia_members[call.from_user.id].vote_on_role_voting = False
+                    await call.answer("Это определенно плохой чувак!", show_alert=True)
+                else:
+                    mafia_members[call.from_user.id].vote_on_role_voting = False
+                    await call.answer("Это определенно ровный типок!", show_alert=True)
             else:
                 await call.answer("Ты уже выследил одного этой ночью!", show_alert=True)
         else:
             await call.answer(f'Вы не шериф!', show_alert=True)
     else:
-        await call.answer("Вы не учавствуете в игре!", show_alert=True)
+        await call.answer("Вы не участвуете в игре!", show_alert=True)
 
 
 @router.callback_query(lambda message: '%mafia%' in message.data)
@@ -152,7 +151,7 @@ async def mafia_vote(call: types.CallbackQuery):
         else:
             await call.answer(f'Вы не мафия!(и не клоун)\nP.S Наверное...', show_alert=True)
     else:
-        await call.answer("Вы не учавствуете в игре!", show_alert=True)
+        await call.answer("Вы не участвуете в игре!", show_alert=True)
 
 
 @router.callback_query(lambda message: '%vote%' in message.data)
@@ -162,12 +161,12 @@ async def mafia_vote(call: types.CallbackQuery):
         await call.answer(f'Вы решили изгнать {mafia_members[int(call.data.split("|")[1])].full_name}!',
                           show_alert=True)
     else:
-        await call.answer("Вы не учавствуете в игре!", show_alert=True)
+        await call.answer("Вы не участвуете в игре!", show_alert=True)
 
 
 @router.message(Command('start_mafia'))
 async def create_mafia_registration(msg: Message):
-    global mafia_active, mafia_members, night_active, mafia_dead_members, days, merce, night_art, day_art
+    global mafia_active, mafia_members, night_active, mafia_dead_members, days, mercy, night_art, day_art
     if not mafia_active:
         builder = InlineKeyboardBuilder()
         builder.add(types.InlineKeyboardButton(
@@ -238,7 +237,7 @@ async def create_mafia_registration(msg: Message):
                 else:
                     await msg.answer("🥀 К сожалению, доктор уже не сможет никому помочь...")
 
-                merce = 0
+                mercy = 0
                 if not mafia_active:
                     break
                 await asyncio.sleep(2)
@@ -260,13 +259,13 @@ async def create_mafia_registration(msg: Message):
                     await loveka.edit_text("💃 Любовница решила, кого ублажить этой ночью, может даже "
                                            "ценою своей или чужой жизни\nP.S Может даже всеми сразу...!")
                 else:
-                    await msg.answer("🥀 В эту ночь жители буду грустные спать одни...")
+                    await msg.answer("🥀 В эту ночь жители будут грустные спать одни...")
                     await asyncio.sleep(3)
                 await asyncio.sleep(3)
                 killed_players = mafia_func.get_killed_players(mafia_members)
                 await msg.answer_photo(caption=
-                                       f"☀️ <b>День {days}</b>\n Солнце всходит, подсушивая на тротуарах пролитую ночью "
-                                       f"кровь...", parse_mode=ParseMode.HTML, photo=day_art)
+                                       f"☀️ <b>День {days}</b>\n Солнце всходит, подсушивая на тротуарах пролитую ночью"
+                                       f" кровь...", parse_mode=ParseMode.HTML, photo=day_art)
                 await asyncio.sleep(3)
                 print(killed_players)
                 if killed_players and mafia_active:
@@ -285,14 +284,15 @@ async def create_mafia_registration(msg: Message):
                 if 0 != mafia_func.count_mafia(mafia_members) < mafia_func.count_peace(mafia_members) and mafia_active:
                     alive_players = [i.full_name for i in list(mafia_members.values())]
                     await msg.answer(
-                        f"🔎 Кто-то из них...\n\n<b>{'</b>, <b>'.join(alive_players)}</b>\n\nКоличество мафий: {mafia_func.count_mafia(mafia_members)}\n\nВам дано время на обсуждение!",
+                        f"🔎 Кто-то из них...\n\n<b>{'</b>, <b>'.join(alive_players)}</b>\nКоличество "
+                        f"мафий: <b>{mafia_func.count_mafia(mafia_members)}</b>\n\nВам дано время на обсуждение!",
                         parse_mode=ParseMode.HTML)
                     night_active = False
-                    await asyncio.sleep(60)
+                    await asyncio.sleep(90)
                     night_active = True
                     vote = await msg.answer("💀 Выберите того, кто по вашему мнению достоин смерти",
                                             reply_markup=mafia_func.create_prefix_keyboard(mafia_members, '%vote%'))
-                    await asyncio.sleep(20)
+                    await asyncio.sleep(15)
                     await vote.delete()
                     k = mafia_func.get_verdict(mafia_members)
                     if k[0] and k[1] is not None:
@@ -324,13 +324,13 @@ async def create_mafia_registration(msg: Message):
                         await asyncio.sleep(3)
                         if mafia_active:
                             await msg.answer_photo(caption=
-                                                    "🌃 Наступает ночь\nНа улицы города выходят лишь самые отважные и "
-                                                    "бесстрашные.\nУтром"
-                                                    "попробуем"
-                                                    "сосчитать их головы...", photo=night_art)
+                                                   "🌃 Наступает ночь\nНа улицы города выходят лишь самые отважные и "
+                                                   "бесстрашные.\nУтром"
+                                                   "попробуем"
+                                                   "сосчитать их головы...", photo=night_art)
                             alive_players = [i.full_name for i in list(mafia_members.values())]
                             await msg.answer(f"😇 Живые игроки:\n<b>{'</b>, <b>'.join(alive_players)}</b>",
-                                            parse_mode=ParseMode.HTML)
+                                             parse_mode=ParseMode.HTML)
                             await asyncio.sleep(3)
 
                     else:
@@ -350,6 +350,7 @@ async def create_mafia_registration(msg: Message):
                     break
             if mafia_func.count_mafia(mafia_members) == 0 and mafia_active:
                 await msg.answer("Игра окончена!!")
+                await asyncio.sleep(2)
                 await msg.answer("Победили мирные!")
                 roles_str = 'Победители:\n\n'
                 for i in list(mafia_members.keys()):
@@ -365,6 +366,7 @@ async def create_mafia_registration(msg: Message):
                 days = 0
             elif mafia_func.count_mafia(mafia_members) != 0 and mafia_active:
                 await msg.answer("Игра окончена!!")
+                await asyncio.sleep(2)
                 await msg.answer("Победила мафия!")
                 for i in list(mafia_members.keys()):
                     if mafia_members[i].role != "Мафия":
