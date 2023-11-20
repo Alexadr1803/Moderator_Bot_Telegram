@@ -24,7 +24,6 @@ night_active = False
 mafia_members = {}
 mafia_dead_members = {}
 days = 0
-mercy = 0
 
 night_art = FSInputFile("images/night_art.jpg")
 day_art = FSInputFile("images/day_art.jpg")
