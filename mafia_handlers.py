@@ -215,7 +215,7 @@ async def create_mafia_registration(msg: Message):
             if mafia_active:
                 await msg.answer_photo(caption=
                                        "🌃 Наступает ночь\nНа улицы города выходят лишь самые отважные и "
-                                       "бесстрашные.\nУтром попробуем"
+                                       "бесстрашные.\nУтром попробуем "
                                        "сосчитать их головы...", photo=night_art)
                 alive_players = [i.full_name for i in list(mafia_members.values())]
                 await msg.answer(f"😇 Живые игроки:\n<b>{'</b>, <b>'.join(alive_players)}</b>",
@@ -315,7 +315,7 @@ async def create_mafia_registration(msg: Message):
                             night_active = True
                             await msg.answer_photo(caption=
                                                    "🌃 Наступает ночь\nНа улицы города выходят лишь самые отважные и "
-                                                   "бесстрашные.\nУтром попробуем"
+                                                   "бесстрашные.\nУтром попробуем "
                                                    "сосчитать их головы...", photo=night_art)
                             alive_players = [i.full_name for i in list(mafia_members.values())]
                             await msg.answer(f"😇 Живые игроки:\n<b>{'</b>, <b>'.join(alive_players)}</b>",
@@ -329,8 +329,8 @@ async def create_mafia_registration(msg: Message):
                         if mafia_active:
                             await msg.answer_photo(caption=
                                                    "🌃 Наступает ночь\nНа улицы города выходят лишь самые отважные и "
-                                                   "бесстрашные.\nУтром"
-                                                   "попробуем"
+                                                   "бесстрашные.\nУтром "
+                                                   "попробуем "
                                                    "сосчитать их головы...", photo=night_art)
                             alive_players = [i.full_name for i in list(mafia_members.values())]
                             await msg.answer(f"😇 Живые игроки:\n<b>{'</b>, <b>'.join(alive_players)}</b>",
@@ -344,7 +344,7 @@ async def create_mafia_registration(msg: Message):
                         if mafia_active:
                             await msg.answer_photo(caption=
                                                    "🌃 Наступает ночь\nНа улицы города выходят лишь самые отважные и "
-                                                   "бесстрашные.\nУтром попробуем"
+                                                   "бесстрашные.\nУтром попробуем "
                                                    "сосчитать их головы...", photo=night_art)
                             alive_players = [i.full_name for i in list(mafia_members.values())]
                             await msg.answer(f"😇 Живые игроки:\n<b>{'</b>, <b>'.join(alive_players)}</b>",
