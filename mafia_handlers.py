@@ -57,9 +57,7 @@ async def check_mafia_role(call: CallbackQuery):
 
 @router.callback_query(F.data == 'register')
 async def registration_to_game(call: CallbackQuery):
-    print(1)
     if call.from_user.id not in list(sessions[call.message.chat.id]['Живые игроки'].keys()):
-        print(2)
         sessions[call.message.chat.id]['Живые игроки'][call.from_user.id] = Player(call.from_user.full_name, user_id=call.from_user.id)
         builder = InlineKeyboardBuilder()
         builder.add(types.InlineKeyboardButton(
@@ -67,7 +65,6 @@ async def registration_to_game(call: CallbackQuery):
             callback_data="register")
         )
         user_names = [i.full_name for i in list(sessions[call.message.chat.id]['Живые игроки'].values())]
-        print(3)
         await call.message.edit_text(
             f"ℹ️ Начата регистрация на игру <b>Мафия</b>\nИгроки: {', '.join(user_names)}",
             reply_markup=builder.as_markup())
@@ -382,7 +379,6 @@ async def end_game(msg: Message):
 
 @router.message()
 async def night_mode(msg: Message):
-    print(sessions)
     try:
         if sessions[msg.chat.id]['Ночь'] and msg.from_user.id in sessions[msg.chat.id]['Живые игроки'].keys() or msg.from_user.id in sessions[msg.chat.id]['Мертвые игроки']:
             await msg.delete()
