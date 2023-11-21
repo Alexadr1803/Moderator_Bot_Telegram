@@ -9,25 +9,15 @@ from aiogram.types import Message, CallbackQuery
 from aiogram.enums import ParseMode
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 import asyncio
-from bot import python
-
+import bot
 # Главные переменные, я буду над ними еще работать (надо уменьшить их количество)
 # Роутер - ответвление бота чисто под мафию
-# sessions - пока не используется, но я хочу вести несколько мафий на одном боте одновременно
-# mafia_active и night_active, благодаря sessions должны уйти, но пока это просто тумблеры ночи и включения катки
-# 3 следующие понятны по названию
-# mercy рандомная переменная запрещающая доку лечить себя
+# sessions - все данные по активным играм
 router = Router()
 sessions = {}
 
 night_art = FSInputFile("images/night_art.jpg")
 day_art = FSInputFile("images/day_art.jpg")
-
-
-def restart_script():
-    global sessions
-    if not sessions:
-        os.execl(python, python, *sys.argv)
 
 
 class Player:
@@ -156,9 +146,15 @@ async def mafia_vote(call: types.CallbackQuery):
 @router.callback_query(lambda message: '%vote%' in message.data)
 async def mafia_vote(call: types.CallbackQuery):
     if call.from_user.id in sessions[call.message.chat.id]['Живые игроки']:
-        sessions[call.message.chat.id]['Живые игроки'][call.from_user.id].vote_on_voting = int(call.data.split('|')[1])
-        await call.answer(f'Вы решили изгнать {sessions[call.message.chat.id]["Живые игроки"][int(call.data.split("|")[1])].full_name}!',
-                          show_alert=True)
+        if sessions[call.message.chat.id]['Живые игроки'][call.from_user.id].vote_on_voting is None:
+            sessions[call.message.chat.id]['Живые игроки'][call.from_user.id].vote_on_voting = int(call.data.split('|')[1])
+            await call.answer(f'Вы решили изгнать {sessions[call.message.chat.id]["Живые игроки"][int(call.data.split("|")[1])].full_name}!',
+                              show_alert=True)
+            await bot.bot.send_message(chat_id=call.message.chat.id, message_thread_id=call.message.message_thread_id, text=f"{sessions[call.message.chat.id]['Живые игроки'][call.from_user.id].full_name} решил изгнать {sessions[call.message.chat.id]['Живые игроки'][int(call.data.split('|')[1])].full_name}!")
+        else:
+            await call.answer(
+                f'Вы уже приняли участие в этом голосовании!',
+                show_alert=True)
     else:
         await call.answer("Вы не участвуете в игре!", show_alert=True)
 

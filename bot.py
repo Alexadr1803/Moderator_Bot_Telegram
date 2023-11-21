@@ -12,10 +12,11 @@ logging.basicConfig(filename=f"logs/{datetime.datetime.now()}py_log.log", filemo
 # Переменная для перезапуска скрипта
 python = sys.executable
 
+bot = Bot(token=config.TOKEN, parse_mode=ParseMode.HTML)
+
 
 # Главная функция активации бота
 async def main():
-    bot = Bot(token=config.TOKEN, parse_mode=ParseMode.HTML)
     dp = Dispatcher()
     dp.include_routers(moder_handlers.router, mafia_handlers.router)
     await bot.delete_webhook(drop_pending_updates=True)
