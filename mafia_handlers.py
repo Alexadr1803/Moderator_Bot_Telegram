@@ -43,7 +43,7 @@ class Player:
 @router.callback_query(F.data == 'check_role')
 async def check_mafia_role(call: CallbackQuery):
     if call.message.chat.id in sessions.keys():
-        if call.from_user.id not in sessions[call.message.chat.id]["Живые игроки"]:
+        if call.from_user.id in sessions[call.message.chat.id]["Живые игроки"]:
             if mafia_func.count_mafia(sessions[call.message.chat.id]['Живые игроки']) != 1 and sessions[call.message.chat.id]['Живые игроки'][call.from_user.id].role == 'Мафия':
                 string = 'Мафии в игре:\n'
                 for i in sessions[call.message.chat.id]['Живые игроки'].keys():
@@ -145,7 +145,7 @@ async def mafia_vote(call: types.CallbackQuery):
                 await call.answer(f'Вы решили убить {sessions[call.message.chat.id]["Живые игроки"][int(call.data.split("|")[1])].full_name}',
                                   show_alert=True)
             else:
-                await call.answer(f'Вы уже предложили убить {sessions[call.message.chat.id]["Живые игроки"][sessions[call.message.chat.id]["Живые игроки"][call.from_user.id]].full_name}!',
+                await call.answer(f'Вы уже предложили убить {sessions[call.message.chat.id]["Живые игроки"][sessions[call.message.chat.id]["Живые игроки"][call.from_user.id].vote_on_role_voting]}!',
                                   show_alert=True)
         else:
             await call.answer(f'Вы не мафия!(и не клоун)\nP.S Наверное...', show_alert=True)
