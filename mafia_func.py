@@ -15,11 +15,7 @@ def count_mafia(mafia_members):
 
 
 def count_peace(mafia_members):
-    k = 0
-    for i in list(mafia_members.keys()):
-        if mafia_members[i].role != 'Мафия':
-            k += 1
-    return k
+    return list(map(attrgetter('role'), mafia_members.values())).count('Мафия') - count_mafia(mafia_members)
 
 
 def count_lover(mafia_members):
