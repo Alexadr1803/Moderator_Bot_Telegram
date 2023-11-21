@@ -50,33 +50,6 @@ async def food_chosen_incorrectly(msg: Message):
         await msg.reply("Добавлено!")
 
 
-# Рандомайзер Кто сегодня ... рофельные функции
-@router.message(Command('kto_segodnia'))
-async def cmd_all_members(msg: types.Message):
-    args = " ".join(msg.text.split()[1:])
-    if len(args) != 0:
-        members = ["Саша", "Катя", "Ростик", "Миша", "Ярик Морозов", "Ярик Аношков", "Ярик Тарасов",
-                   "Егор Сапронов", "Егор Чвыков", "Андрей Бышов", "Андрей Спичак", "Ксюша Власенко",
-                   "Ксюша Клыкова", "Настя Масалова", "Настя Клевцова", "Маша Сидорова",
-                   "Машка Волкова", "Вова", "Кирилл", "Глеб", "Авдей", "Витя", "Никита Черкасов",
-                   "Никита Онуфриенко", "Даня Хорхордин", "Даня Мищенко", "Лера", "Федя", "Максим", "Богдан"]
-        await msg.reply(text=f"<b>{random.choice(members)}</b> {''.join(args.split('?'))} сегодня!",
-                        parse_mode=ParseMode.HTML)
-    else:
-        await msg.reply(text="Формат ввода: /kto_segodnia <описание>", parse_mode=None)
-
-
-# Рандомайзер типа того шара с предсказаниями
-@router.message(Command('skazi_pravdu'))
-async def pravda_skim(m: types.Message):
-    args = " ".join(m.text.split()[1:])
-    if len(args) == 0:
-        await m.reply(text="Напишите: /skazi_pravdu <вопрос>", parse_mode=None)
-    else:
-        await m.reply(text=random.choice(["Да ;)", "Нет :(", "Наверное :/",
-                                          "Cкорее да, чем нет! :|", "Скорее нет, чем да! :0"]))
-
-
 # Активирует добавление матов только у меня в личке
 @router.message(Command('add_mat'))
 async def set_state_mats(msg: Message, state=FSMContext):
