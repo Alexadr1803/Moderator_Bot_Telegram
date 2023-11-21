@@ -17,15 +17,12 @@ class ChatCensureFilter(BaseFilter):
     async def __call__(self, msg: Message) -> bool:
         if msg.text is None:
             return False
-        if msg.message_thread_id is None:
-            text = re.sub(r'[^\w\s]', ' ', msg.text.lower())
-            with open("mats.txt", 'r') as file:
-                if set([''.join(i.split('\n')) for i in file.readlines()]) & set(text.split()):
-                    return True
-                else:
-                    return False
-        else:
-            return False
+        text = re.sub(r'[^\w\s]', ' ', msg.text.lower())
+        with open("mats.txt", 'r') as file:
+            if set([''.join(i.split('\n')) for i in file.readlines()]) & set(text.split()):
+                return True
+            else:
+                return False
 
 
 # Обработчик сообщений
