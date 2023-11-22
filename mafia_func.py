@@ -15,7 +15,7 @@ def count_mafia(mafia_members):
 
 
 def count_peace(mafia_members):
-    return list(map(attrgetter('role'), mafia_members.values())).count('Мафия') - count_mafia(mafia_members)
+    return len(list(map(attrgetter('role'), mafia_members.values()))) - count_mafia(mafia_members)
 
 
 def count_lover(mafia_members):
