@@ -69,7 +69,7 @@ def get_killed_players(mafia_members: dict):
                 mafias_voting.append(mafia_members[i].vote_on_role_voting)
     # Подведение итогов голосования мафии
     c = Counter(mafias_voting).most_common(2)
-    if len(c) > 0:
+    if len(c) > 1:
         if c[0][1] == c[1][1]:
             s = random.choice([c[0][0], c[1][0]])
         else:
