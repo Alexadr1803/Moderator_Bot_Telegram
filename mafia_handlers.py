@@ -266,8 +266,7 @@ async def create_mafia_registration(msg: Message):
                         sessions[msg.chat.id]["Живые игроки"].pop(i)
                 elif not killed_players and msg.chat.id in sessions.keys():
                     await msg.answer("🤞 Этой ночью никого не убили...")
-                for i in sessions[msg.chat.id]["Живые игроки"].keys():
-                    sessions[msg.chat.id]["Живые игроки"][i].vote_on_role_voting = None
+
                 if 0 != mafia_func.count_mafia(sessions[msg.chat.id]["Живые игроки"]) < mafia_func.count_peace(sessions[msg.chat.id]["Живые игроки"]) and msg.chat.id in sessions.keys():
                     await msg.answer(
                         f"🔎 Кто-то из них...\n\n<b>"
@@ -281,6 +280,10 @@ async def create_mafia_registration(msg: Message):
                                             reply_markup=mafia_func.create_prefix_keyboard(sessions[msg.chat.id]['Живые игроки'], '%vote%'))
                     await asyncio.sleep(15)
                     await vote.delete()
+                    for i in sessions[msg.chat.id]["Живые игроки"].keys():
+                        sessions[msg.chat.id]["Живые игроки"][i].vote_on_role_voting = None
+                        sessions[msg.chat.id]["Живые игроки"][i].vote_on_voiting = None
+
                     k = mafia_func.get_verdict(sessions[msg.chat.id]['Живые игроки'])
                     if k[0] and k[1] is not None:
                         killed_players = [k[1]]

@@ -13,8 +13,6 @@ logging.basicConfig(filename=f"logs/{datetime.datetime.now()}py_log.log", filemo
 python = sys.executable
 
 bot = Bot(token=config.TOKEN, parse_mode=ParseMode.HTML)
-
-
 # Главная функция активации бота
 async def main():
     dp = Dispatcher()
