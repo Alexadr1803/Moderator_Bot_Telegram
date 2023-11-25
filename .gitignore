@@ -4,9 +4,10 @@ __pycache__/
 *$py.class
 
 # C extensions
+config.py
 *.so
 test_files/
-logs/
+logs
 # Distribution / packaging
 .Python
 build/

@@ -212,7 +212,7 @@ async def create_mafia_registration(msg: Message):
                 mafia_voting = await msg.answer("🔫 Мафия выходит на охоту",
                                                 reply_markup=mafia_func.create_prefix_keyboard(sessions[msg.chat.id]['Живые игроки'],
                                                                                                '%mafia%'))
-                await asyncio.sleep(10 * mafia_func.count_mafia(sessions[msg.chat.id]['Живые игроки']))
+                await asyncio.sleep(15 * mafia_func.count_mafia(sessions[msg.chat.id]['Живые игроки']))
                 await mafia_voting.edit_text("🔫 Мафия сделала свой выбор (мб даже не в свою пользу)!")
                 await asyncio.sleep(2)
                 if msg.chat.id not in sessions.keys():
@@ -222,7 +222,7 @@ async def create_mafia_registration(msg: Message):
                                               "профилактирует...",
                                               reply_markup=mafia_func.create_prefix_keyboard(sessions[msg.chat.id]['Живые игроки'],
                                                                                              "%doctor%"))
-                    await asyncio.sleep(10)
+                    await asyncio.sleep(15)
                     await doctor.edit_text("🧑‍⚕️ Доктор выбрал кому помочь...")
                 else:
                     await msg.answer("🥀 К сожалению, доктор уже не сможет никому помочь...")
@@ -243,7 +243,7 @@ async def create_mafia_registration(msg: Message):
                 if mafia_func.count_lover(sessions[msg.chat.id]['Живые игроки']) != 0:
                     loveka = await msg.answer("💃 Любовница решает, кто умр... кхм, будет спать счастливым!",
                                               reply_markup=mafia_func.create_prefix_keyboard(sessions[msg.chat.id]['Живые игроки'], "%lover%"))
-                    await asyncio.sleep(10)
+                    await asyncio.sleep(15)
                     await loveka.edit_text("💃 Любовница решила, кого ублажить этой ночью, может даже "
                                            "ценою своей или чужой жизни\nP.S Может даже всеми сразу...!")
                 else:
