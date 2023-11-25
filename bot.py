@@ -1,9 +1,9 @@
 import asyncio
 import datetime
 import logging
-import config
-import moder_handlers
-import mafia_handlers
+from configs import config
+from moderator import moder_handlers
+from mafia import mafia_handlers
 import sys
 from aiogram import Bot, Dispatcher
 from aiogram.enums.parse_mode import ParseMode

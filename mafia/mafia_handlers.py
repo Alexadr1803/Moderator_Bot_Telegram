@@ -1,9 +1,7 @@
 from aiogram import F, types, Router
 import random
-import mafia_func
+from mafia import mafia_func
 from aiogram.types import FSInputFile
-import sys
-import os
 from aiogram.filters import Command
 from aiogram.types import Message, CallbackQuery
 from aiogram.enums import ParseMode
@@ -16,8 +14,8 @@ import bot
 router = Router()
 sessions = {}
 
-night_art = FSInputFile("images/night_art.jpg")
-day_art = FSInputFile("images/day_art.jpg")
+night_art = FSInputFile("../images/night_art.jpg")
+day_art = FSInputFile("../images/day_art.jpg")
 
 
 class Player:
