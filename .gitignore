@@ -8,6 +8,7 @@ __pycache__/
 *.so
 test_files/
 logs
+configs
 # Distribution / packaging
 .Python
 build/

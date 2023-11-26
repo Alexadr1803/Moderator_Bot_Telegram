@@ -14,8 +14,8 @@ import bot
 router = Router()
 sessions = {}
 
-night_art = FSInputFile("../images/night_art.jpg")
-day_art = FSInputFile("../images/day_art.jpg")
+night_art = FSInputFile("images/night_art.jpg")
+day_art = FSInputFile("images/day_art.jpg")
 
 
 class Player:
