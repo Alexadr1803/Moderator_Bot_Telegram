@@ -13,7 +13,7 @@ class ChatCensureFilter(BaseFilter):
         if msg.text is None:
             return False
         text = re.sub(r'[^\w\s]', ' ', msg.text.lower())
-        with open("moderator/mats.txt", 'r') as file:
+        with open("moderator/mats.txt", 'r', encoding='utf-8') as file:
             if set([''.join(i.split('\n')) for i in file.readlines()]) & set(text.split()):
                 return True
             else:
