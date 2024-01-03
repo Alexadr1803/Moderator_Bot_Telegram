@@ -15,8 +15,8 @@ def update_stats(userId, chatId, badWord=0, messag=1, userName='Bacon'):
     connection = sqlite3.connect('moderator/statistics')
     cursor = connection.cursor()
     if cursor.execute("SELECT message_count FROM messages_stats WHERE id = ? AND group_id = ?", (userId, chatId)).fetchall():
-        bad_words = cursor.execute("SELECT bad_messages_count FROM messages_stats WHERE id = ?", (userId, )).fetchall()[0][0]
-        messages_count = cursor.execute("SELECT message_count FROM messages_stats WHERE id = ?", (userId, )).fetchall()[0][0]
+        bad_words = cursor.execute("SELECT bad_messages_count FROM messages_stats WHERE id = ? AND group_id = ?", (userId, chatId)).fetchall()[0][0]
+        messages_count = cursor.execute("SELECT message_count FROM messages_stats WHERE id = ? AND group_id = ?", (userId, chatId)).fetchall()[0][0]
         cursor.execute('UPDATE messages_stats SET (bad_messages_count, message_count, user_name) = (?, ?, ?) WHERE id = ? AND group_id = ?', (bad_words + badWord, messages_count + messag, userName, userId, chatId))
         connection.commit()
     else:
@@ -45,11 +45,12 @@ async def start(msg: Message):
     await msg.delete()
     update_stats(userId=msg.from_user.id, chatId=msg.chat.id, badWord=1, messag=1, userName=msg.from_user.full_name)
 
+
 @router.message(Command('mes_stats'))
 async def mes_stats(msg: Message):
     connection = sqlite3.connect('moderator/statistics')
     cursor = connection.cursor()
-    users = cursor.execute("SELECT user_name, message_count FROM messages_stats WHERE group_id = ?", (msg.chat.id, )).fetchall()
+    users = cursor.execute("SELECT user_name, message_count FROM messages_stats WHERE group_id = ?", (str(msg.chat.id), )).fetchall()
     if users:
         users.sort(key=lambda x: x[1], reverse=True)
         text = f"Топ по сообщениям:\n 🏆 1. <b>{users[0][0]}</b> - {users[0][1]}\n"
@@ -58,12 +59,14 @@ async def mes_stats(msg: Message):
         await msg.answer(text=text, parse_mode=ParseMode.HTML)
     else:
         await msg.answer(text="Никто еще не писал в этот чат(", parse_mode=ParseMode.HTML)
+    connection.close()
+
 
 @router.message(Command('bad_stats'))
 async def mes_stats(msg: Message):
     connection = sqlite3.connect('moderator/statistics')
     cursor = connection.cursor()
-    users = cursor.execute("SELECT user_name, bad_messages_count FROM messages_stats WHERE group_id = ?", (msg.chat.id, )).fetchall()
+    users = cursor.execute("SELECT user_name, bad_messages_count FROM messages_stats WHERE group_id = ?", (str(msg.chat.id), )).fetchall()
     if users:
         users.sort(key=lambda x: x[1], reverse=True)
         text = f"Топ по матам:\n 🥀 1. <b>{users[0][0]}</b> - {users[0][1]}\n"
@@ -72,3 +75,4 @@ async def mes_stats(msg: Message):
         await msg.answer(text=text, parse_mode=ParseMode.HTML)
     else:
         await msg.answer(text="Никто еще не писал в этот чат(", parse_mode=ParseMode.HTML)
+    connection.close()
