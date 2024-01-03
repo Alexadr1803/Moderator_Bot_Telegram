@@ -390,4 +390,3 @@ async def night_mode(msg: Message):
             update_stats(userId=msg.from_user.id, chatId=msg.chat.id, badWord=0, messag=1, userName=msg.from_user.full_name)
     except KeyError:
         update_stats(userId=msg.from_user.id, chatId=msg.chat.id, badWord=0, messag=1, userName=msg.from_user.full_name)
-
