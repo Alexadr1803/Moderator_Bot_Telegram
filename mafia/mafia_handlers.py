@@ -1,13 +1,16 @@
-from aiogram import F, types, Router
-import random
-from mafia import mafia_func
-from aiogram.types import FSInputFile
-from aiogram.filters import Command
-from aiogram.types import Message, CallbackQuery
-from aiogram.enums import ParseMode
-from aiogram.utils.keyboard import InlineKeyboardBuilder
 import asyncio
+import random
+
+from aiogram import F, types, Router
+from aiogram.enums import ParseMode
+from aiogram.filters import Command
+from aiogram.types import FSInputFile
+from aiogram.types import Message, CallbackQuery
+from aiogram.utils.keyboard import InlineKeyboardBuilder
+
 import bot
+from mafia import mafia_func
+
 # Главные переменные, я буду над ними еще работать (надо уменьшить их количество)
 # Роутер - ответвление бота чисто под мафию
 # sessions - все данные по активным играм
@@ -379,9 +382,12 @@ async def end_game(msg: Message):
 
 @router.message()
 async def night_mode(msg: Message):
+    from moderator.moder_handlers import update_stats
     try:
         if sessions[msg.chat.id]['Ночь'] and msg.from_user.id in sessions[msg.chat.id]['Живые игроки'].keys() or msg.from_user.id in sessions[msg.chat.id]['Мертвые игроки']:
             await msg.delete()
+        else:
+            update_stats(userId=msg.from_user.id, chatId=msg.chat.id, badWord=0, messag=1, userName=msg.from_user.full_name)
     except KeyError:
-        pass
+        update_stats(userId=msg.from_user.id, chatId=msg.chat.id, badWord=0, messag=1, userName=msg.from_user.full_name)
 
