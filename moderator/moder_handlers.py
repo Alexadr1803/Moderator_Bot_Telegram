@@ -14,7 +14,7 @@ stemmer = SnowballStemmer("russian")
 def update_stats(userId, chatId, badWord=0, messag=1, userName='Bacon'):
     connection = sqlite3.connect('moderator/statistics')
     cursor = connection.cursor()
-    if cursor.execute("SELECT message_count FROM messages_stats WHERE id = ?", (userId, )).fetchall():
+    if cursor.execute("SELECT message_count FROM messages_stats WHERE id = ? AND group_id = ?", (userId, chatId)).fetchall():
         bad_words = cursor.execute("SELECT bad_messages_count FROM messages_stats WHERE id = ?", (userId, )).fetchall()[0][0]
         messages_count = cursor.execute("SELECT message_count FROM messages_stats WHERE id = ?", (userId, )).fetchall()[0][0]
         cursor.execute('UPDATE messages_stats SET (bad_messages_count, message_count, user_name) = (?, ?, ?) WHERE id = ? AND group_id = ?', (bad_words + badWord, messages_count + messag, userName, userId, chatId))
