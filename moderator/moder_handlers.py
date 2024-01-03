@@ -41,9 +41,11 @@ class ChatCensureFilter(BaseFilter):
 # Обработчик сообщений
 @router.message(ChatCensureFilter())
 async def start(msg: Message):
-    await msg.answer(text=f"Не матерись <b>{msg.from_user.full_name}</b>!\nЯ все вижу!", parse_mode=ParseMode.HTML)
-    await msg.delete()
+    if msg.chat.id == -1002032383245:
+        await msg.answer(text=f"Не матерись <b>{msg.from_user.full_name}</b>!\nЯ все вижу!", parse_mode=ParseMode.HTML)
+        await msg.delete()
     update_stats(userId=msg.from_user.id, chatId=msg.chat.id, badWord=1, messag=1, userName=msg.from_user.full_name)
+
 
 
 @router.message(Command('mes_stats'))
@@ -51,6 +53,7 @@ async def mes_stats(msg: Message):
     connection = sqlite3.connect('moderator/statistics')
     cursor = connection.cursor()
     users = cursor.execute("SELECT user_name, message_count FROM messages_stats WHERE group_id = ?", (str(msg.chat.id), )).fetchall()
+    print(msg.chat.id)
     if users:
         users.sort(key=lambda x: x[1], reverse=True)
         text = f"Топ по сообщениям:\n 🏆 1. <b>{users[0][0]}</b> - {users[0][1]}\n"
